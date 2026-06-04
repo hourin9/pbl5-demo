@@ -1,24 +1,11 @@
 import streamlit as st;
 import subprocess;
 import os;
+import sys;
 
-def execute(url) -> str:
-    orig_dir = os.getcwd();
-    ner_path = "/mnt/d/pbl5-queries/";
-
-    try:
-        os.chdir(ner_path);
-        result = subprocess.run(
-            ["uv", "run", "ner.py", "-r", url],
-            capture_output=True,
-            text=True,
-            check=True,
-        );
-
-        with open("csv.csv", "r") as file:
-            return file.read();
-    finally:
-        os.chdir(orig_dir);
+# Python importing bullshit
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "pbl5")))
+from pbl5 import ner;
 
 def add_data_block(file_name: str, java_class: str, code: str, diagnosis: str):
     with st.container(border=True):
@@ -36,32 +23,24 @@ def add_data_block(file_name: str, java_class: str, code: str, diagnosis: str):
         st.caption("Diagnosis")
         st.info(diagnosis)
 
+def execute(url):
+    _, result = ner.run_git(url);
+    for path, entry in result:
+        add_data_block(
+            path,
+            entry["Class"],
+            entry["Code"],
+            "nothing"
+        );
+
 st.title("lingang guliguli");
 
 url = st.text_input("link");
 
-mock_data = [
-    {
-        "file": "UserController.java",
-        "class": "UserController",
-        "code": "public void login() {\n    log.info(\"User logging in\");\n}",
-        "diagnosis": "lingang guliguliguli"
-    },
-    {
-        "file": "AuthService.java",
-        "class": "AuthService",
-        "code": "if (password == \"123\") {\n    grantAccess();\n}",
-        "diagnosis": "lingang guliguliguli"
-    }
-]
-
 if st.button("show shit"):
     if url:
         st.write(f"actual {url} shit");
-        for item in mock_data:
-            add_data_block(item["file"], item["class"], item["code"], item["diagnosis"]);
-
-        st.write(execute(url));
+        execute(url);
     else:
         st.warning("Please enter a link");
 
