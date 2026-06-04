@@ -1,0 +1,3 @@
+[submodule "pbl5"]
+	path = pbl5
+	url = https://github.com/hourin9/pbl5-queries
