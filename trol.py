@@ -24,7 +24,10 @@ st.title("lingang guliguli");
 
 url = st.text_input("link");
 
-if st.checkbox("show shit"):
-    st.write(f"actual {url} shit");
-    st.write(execute(url));
+if st.button("show shit"):
+    if url:
+        st.write(f"actual {url} shit");
+        st.write(execute(url));
+    else:
+        st.warning("Please enter a link");
 
